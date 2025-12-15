@@ -8,11 +8,18 @@ import FitnessView from './components/FitnessView';
 import RoutineView from './components/RoutineView';
 import NewsView from './components/NewsView';
 import RawModeView from './components/RawModeView';
+import LockScreen from './components/LockScreen';
 
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewType>(ViewType.CHAT);
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+  
+  // Security State
+  const [isLocked, setIsLocked] = useState(true);
+  
+  // Navigation State for Studio (default tab)
+  const [studioInitialTab, setStudioInitialTab] = useState<'image' | 'video' | 'audio'>('image');
 
   // Responsive handling
   useEffect(() => {
@@ -30,28 +37,34 @@ const App: React.FC = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  const handleNavigate = (view: ViewType, subTab?: string) => {
+    if (view === ViewType.STUDIO && subTab) {
+      setStudioInitialTab(subTab as 'image' | 'video' | 'audio');
+    }
+    setCurrentView(view);
+    if (isMobile) setSidebarOpen(false);
+  };
+
   const renderView = () => {
     switch (currentView) {
-      case ViewType.CHAT: return <ChatView />;
-      case ViewType.STUDIO: return <StudioView />;
+      case ViewType.CHAT: return <ChatView onNavigate={handleNavigate} />;
+      case ViewType.STUDIO: return <StudioView initialTab={studioInitialTab} />;
       case ViewType.AUTOMATE: return <AutomateView />;
       case ViewType.CODING: return <CodingView />;
       case ViewType.FITNESS: return <FitnessView />;
       case ViewType.ROUTINE: return <RoutineView />;
       case ViewType.NEWS: return <NewsView />;
       case ViewType.RAW: return <RawModeView />;
-      default: return <ChatView />;
+      default: return <ChatView onNavigate={handleNavigate} />;
     }
-  };
-
-  const handleNavClick = (view: ViewType) => {
-    setCurrentView(view);
-    if (isMobile) setSidebarOpen(false);
   };
 
   return (
     <div className="flex h-screen bg-[url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2670&auto=format&fit=crop')] bg-cover bg-center overflow-hidden relative">
       <div className="absolute inset-0 bg-slate-950/90 backdrop-blur-sm"></div>
+      
+      {/* Security Overlay */}
+      {isLocked && <LockScreen onUnlock={() => setIsLocked(false)} />}
       
       {/* Prominent Website Link (Floating Top Right) */}
       <a 
@@ -84,7 +97,7 @@ const App: React.FC = () => {
         <div className="fixed inset-0 bg-black/80 z-40 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
       )}
 
-      {/* Sidebar: Increased z-index for mobile, explicit background to ensure visibility */}
+      {/* Sidebar */}
       <aside className={`${isMobile ? 'fixed inset-y-0 left-0 z-50 shadow-2xl border-r border-slate-700' : 'relative z-10 border-r border-slate-800'} ${isSidebarOpen ? 'w-64' : 'w-20'} transition-all duration-300 ease-in-out bg-slate-900 flex flex-col ${isMobile && !isSidebarOpen ? '-translate-x-full' : 'translate-x-0'}`}>
         {!isMobile && (
           <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="absolute -right-3 top-6 bg-slate-800 text-slate-400 p-1 rounded-full border border-slate-700 text-xs hover:text-white z-50">
@@ -114,16 +127,16 @@ const App: React.FC = () => {
         </div>
 
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-          <NavItem icon="fa-comments" label="Chatbot" isActive={currentView === ViewType.CHAT} onClick={() => handleNavClick(ViewType.CHAT)} isOpen={isSidebarOpen} />
-          <NavItem icon="fa-code" label="Coding" isActive={currentView === ViewType.CODING} onClick={() => handleNavClick(ViewType.CODING)} isOpen={isSidebarOpen} />
-          <NavItem icon="fa-layer-group" label="Studio" isActive={currentView === ViewType.STUDIO} onClick={() => handleNavClick(ViewType.STUDIO)} isOpen={isSidebarOpen} />
-          <NavItem icon="fa-robot" label="Automate" isActive={currentView === ViewType.AUTOMATE} onClick={() => handleNavClick(ViewType.AUTOMATE)} isOpen={isSidebarOpen} />
+          <NavItem icon="fa-comments" label="Chatbot" isActive={currentView === ViewType.CHAT} onClick={() => handleNavigate(ViewType.CHAT)} isOpen={isSidebarOpen} />
+          <NavItem icon="fa-code" label="Coding" isActive={currentView === ViewType.CODING} onClick={() => handleNavigate(ViewType.CODING)} isOpen={isSidebarOpen} />
+          <NavItem icon="fa-layer-group" label="Studio" isActive={currentView === ViewType.STUDIO} onClick={() => handleNavigate(ViewType.STUDIO)} isOpen={isSidebarOpen} />
+          <NavItem icon="fa-robot" label="Automate" isActive={currentView === ViewType.AUTOMATE} onClick={() => handleNavigate(ViewType.AUTOMATE)} isOpen={isSidebarOpen} />
           <div className="my-2 border-t border-slate-800"></div>
-          <NavItem icon="fa-dumbbell" label="Fitness" isActive={currentView === ViewType.FITNESS} onClick={() => handleNavClick(ViewType.FITNESS)} isOpen={isSidebarOpen} />
-          <NavItem icon="fa-calendar-check" label="Routine" isActive={currentView === ViewType.ROUTINE} onClick={() => handleNavClick(ViewType.ROUTINE)} isOpen={isSidebarOpen} />
-          <NavItem icon="fa-newspaper" label="Daily News" isActive={currentView === ViewType.NEWS} onClick={() => handleNavClick(ViewType.NEWS)} isOpen={isSidebarOpen} />
+          <NavItem icon="fa-dumbbell" label="Fitness" isActive={currentView === ViewType.FITNESS} onClick={() => handleNavigate(ViewType.FITNESS)} isOpen={isSidebarOpen} />
+          <NavItem icon="fa-calendar-check" label="Routine" isActive={currentView === ViewType.ROUTINE} onClick={() => handleNavigate(ViewType.ROUTINE)} isOpen={isSidebarOpen} />
+          <NavItem icon="fa-newspaper" label="Daily News" isActive={currentView === ViewType.NEWS} onClick={() => handleNavigate(ViewType.NEWS)} isOpen={isSidebarOpen} />
           <div className="my-2 border-t border-slate-800"></div>
-          <NavItem icon="fa-lock" label="Raw Mode" isActive={currentView === ViewType.RAW} onClick={() => handleNavClick(ViewType.RAW)} isOpen={isSidebarOpen} isDanger={true} />
+          <NavItem icon="fa-lock" label="Raw Mode" isActive={currentView === ViewType.RAW} onClick={() => handleNavigate(ViewType.RAW)} isOpen={isSidebarOpen} isDanger={true} />
         </nav>
 
         <div className="p-4 border-t border-slate-800">

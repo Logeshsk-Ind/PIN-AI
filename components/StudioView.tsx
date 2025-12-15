@@ -1,13 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { generateImage, generateVideo, generateSpeech } from '../services/geminiService';
 import { GeneratedMedia, VideoAspectRatio } from '../types';
 
-const StudioView: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'image' | 'video' | 'audio'>('image');
+interface StudioViewProps {
+  initialTab?: 'image' | 'video' | 'audio';
+}
+
+const StudioView: React.FC<StudioViewProps> = ({ initialTab = 'image' }) => {
+  const [activeTab, setActiveTab] = useState<'image' | 'video' | 'audio'>(initialTab);
   const [prompt, setPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [gallery, setGallery] = useState<GeneratedMedia[]>([]);
   const [videoAspectRatio, setVideoAspectRatio] = useState<VideoAspectRatio>('16:9');
+
+  useEffect(() => {
+    if (initialTab) setActiveTab(initialTab);
+  }, [initialTab]);
 
   const handleGenerate = async () => {
     if (!prompt.trim()) return;

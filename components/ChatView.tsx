@@ -1,8 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ChatMessage, ImageAttachment } from '../types';
+import { ChatMessage, ImageAttachment, ViewType } from '../types';
 import { streamChatResponse } from '../services/geminiService';
 
-const ChatView: React.FC = () => {
+interface ChatViewProps {
+  onNavigate?: (view: ViewType, subTab?: string) => void;
+}
+
+const ChatView: React.FC<ChatViewProps> = ({ onNavigate }) => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     { id: '1', role: 'model', text: 'Hello! I am Pin Ai. I can see images and speak Indian languages. Try uploading a photo or asking me something!' }
   ]);
@@ -61,10 +65,6 @@ const ChatView: React.FC = () => {
     setMessages(prev => [...prev, { id: modelMsgId, role: 'model', text: '' }]);
 
     try {
-      // Convert current state to history format for API
-      // Note: We need to filter out images for history if not supported by all models, 
-      // but gemini-2.5 and 3 pro handle multi-turn well usually.
-      // We will map attachments to the correct format for history if needed.
       const history = messages.map(m => {
         const parts: any[] = [{ text: m.text }];
         if (m.images) {
@@ -167,25 +167,81 @@ const ChatView: React.FC = () => {
             </div>
           </div>
         ))}
+
+        {/* Feature Discovery Grid (Visible when conversation is new) */}
+        {messages.length === 1 && (
+          <div className="mt-8 px-2 md:px-6">
+            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4 ml-1">Featured Capabilities</h3>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              {/* Feature 1: Video */}
+              <button 
+                onClick={() => onNavigate && onNavigate(ViewType.STUDIO, 'video')}
+                className="bg-slate-800/60 p-4 rounded-xl border border-slate-700 hover:border-pin-gold hover:bg-slate-800 transition-all text-left group"
+              >
+                <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                  <i className="fas fa-video text-pin-gold"></i>
+                </div>
+                <h4 className="font-bold text-sm text-slate-200">Video Gen</h4>
+                <p className="text-[10px] text-slate-400 mt-1">Prompt to Video with Veo 3</p>
+              </button>
+
+              {/* Feature 2: Fast Mode */}
+              <button 
+                onClick={() => setUseFastModel(!useFastModel)}
+                className={`bg-slate-800/60 p-4 rounded-xl border transition-all text-left group ${useFastModel ? 'border-yellow-500 bg-yellow-900/10' : 'border-slate-700 hover:border-yellow-500 hover:bg-slate-800'}`}
+              >
+                <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                  <i className="fas fa-bolt text-yellow-500"></i>
+                </div>
+                <h4 className="font-bold text-sm text-slate-200">Fast Responses</h4>
+                <p className="text-[10px] text-slate-400 mt-1">{useFastModel ? 'Enabled (Flash Lite)' : 'Enable Flash Lite'}</p>
+              </button>
+
+              {/* Feature 3: Image Analysis */}
+              <button 
+                onClick={() => fileInputRef.current?.click()}
+                className="bg-slate-800/60 p-4 rounded-xl border border-slate-700 hover:border-pin-teal hover:bg-slate-800 transition-all text-left group"
+              >
+                <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                  <i className="fas fa-expand text-pin-teal"></i>
+                </div>
+                <h4 className="font-bold text-sm text-slate-200">Analyze Images</h4>
+                <p className="text-[10px] text-slate-400 mt-1">Gemini 3 Pro Vision</p>
+              </button>
+
+               {/* Feature 4: TTS */}
+              <button 
+                onClick={() => onNavigate && onNavigate(ViewType.STUDIO, 'audio')}
+                className="bg-slate-800/60 p-4 rounded-xl border border-slate-700 hover:border-pink-500 hover:bg-slate-800 transition-all text-left group"
+              >
+                <div className="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                  <i className="fas fa-music text-pink-500"></i>
+                </div>
+                <h4 className="font-bold text-sm text-slate-200">Generate Speech</h4>
+                <p className="text-[10px] text-slate-400 mt-1">Text to Audio</p>
+              </button>
+            </div>
+          </div>
+        )}
         
         {/* Language Suggestions */}
         {messages.length === 1 && (
-           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-4 px-4">
-              <button onClick={() => handleSend("வணக்கம்! எப்படி இருக்கிறீர்கள்?")} className="p-3 bg-slate-800/50 border border-slate-700 hover:border-pin-teal rounded-xl text-left transition-all group">
-                <span className="text-xs text-slate-400 block mb-1">Tamil</span>
-                <span className="text-sm text-slate-200 font-medium group-hover:text-pin-teal">வணக்கம்!</span>
+           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-2 px-2 md:px-6">
+              <button onClick={() => handleSend("வணக்கம்! எப்படி இருக்கிறீர்கள்?")} className="p-3 bg-slate-800/30 border border-slate-700/50 hover:border-pin-teal rounded-xl text-left transition-all group">
+                <span className="text-xs text-slate-500 block mb-1">Tamil</span>
+                <span className="text-sm text-slate-300 font-medium group-hover:text-pin-teal">வணக்கம்!</span>
               </button>
-              <button onClick={() => handleSend("నమస్కారం! మీరు ఎలా ఉన్నారు?")} className="p-3 bg-slate-800/50 border border-slate-700 hover:border-pin-teal rounded-xl text-left transition-all group">
-                <span className="text-xs text-slate-400 block mb-1">Telugu</span>
-                <span className="text-sm text-slate-200 font-medium group-hover:text-pin-teal">నమస్కారం!</span>
+              <button onClick={() => handleSend("నమస్కారం! మీరు ఎలా ఉన్నారు?")} className="p-3 bg-slate-800/30 border border-slate-700/50 hover:border-pin-teal rounded-xl text-left transition-all group">
+                <span className="text-xs text-slate-500 block mb-1">Telugu</span>
+                <span className="text-sm text-slate-300 font-medium group-hover:text-pin-teal">నమస్కారం!</span>
               </button>
-              <button onClick={() => handleSend("നമസ്കാരം! സുഖമാണോ?")} className="p-3 bg-slate-800/50 border border-slate-700 hover:border-pin-teal rounded-xl text-left transition-all group">
-                <span className="text-xs text-slate-400 block mb-1">Malayalam</span>
-                <span className="text-sm text-slate-200 font-medium group-hover:text-pin-teal">നമസ്കാരം!</span>
+              <button onClick={() => handleSend("നമസ്കാരം! സുഖമാണോ?")} className="p-3 bg-slate-800/30 border border-slate-700/50 hover:border-pin-teal rounded-xl text-left transition-all group">
+                <span className="text-xs text-slate-500 block mb-1">Malayalam</span>
+                <span className="text-sm text-slate-300 font-medium group-hover:text-pin-teal">നമസ്കാരം!</span>
               </button>
-              <button onClick={() => handleSend("ನಮಸ್ಕಾರ! ಹೇಗಿದ್ದೀರಾ?")} className="p-3 bg-slate-800/50 border border-slate-700 hover:border-pin-teal rounded-xl text-left transition-all group">
-                <span className="text-xs text-slate-400 block mb-1">Kannada</span>
-                <span className="text-sm text-slate-200 font-medium group-hover:text-pin-teal">ನಮಸ್ಕಾರ!</span>
+              <button onClick={() => handleSend("ನಮಸ್ಕಾರ! ಹೇಗಿದ್ದೀರಾ?")} className="p-3 bg-slate-800/30 border border-slate-700/50 hover:border-pin-teal rounded-xl text-left transition-all group">
+                <span className="text-xs text-slate-500 block mb-1">Kannada</span>
+                <span className="text-sm text-slate-300 font-medium group-hover:text-pin-teal">ನಮಸ್ಕಾರ!</span>
               </button>
            </div>
         )}
