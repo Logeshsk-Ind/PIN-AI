@@ -1,78 +1,111 @@
-export enum ViewType {
+// ==================== Enums ====================
+
+export enum AppMode {
   CHAT = 'CHAT',
-  STUDIO = 'STUDIO',
-  AUTOMATE = 'AUTOMATE',
-  CODING = 'CODING',
-  FITNESS = 'FITNESS',
-  ROUTINE = 'ROUTINE',
-  NEWS = 'NEWS',
-  RAW = 'RAW'
+  MEDIA_STUDIO = 'MEDIA_STUDIO',
+  OFFICE_ASSISTANT = 'OFFICE_ASSISTANT',
+  LIFE_COACH = 'LIFE_COACH',
 }
+
+export enum MessageRole {
+  USER = 'user',
+  MODEL = 'model',
+  SYSTEM = 'system'
+}
+
+export enum ErrorType {
+  API_ERROR = 'API_ERROR',
+  NETWORK_ERROR = 'NETWORK_ERROR',
+  VALIDATION_ERROR = 'VALIDATION_ERROR',
+  RATE_LIMIT = 'RATE_LIMIT',
+  UNKNOWN = 'UNKNOWN'
+}
+
+export enum MediaType {
+  IMAGE = 'IMAGE',
+  VIDEO = 'VIDEO',
+  AUDIO = 'AUDIO'
+}
+
+export enum FocusMode {
+  GENERAL = 'GENERAL',
+  CODING = 'CODING'
+}
+
+// ==================== Interfaces ====================
 
 export interface ChatMessage {
   id: string;
-  role: 'user' | 'model';
-  text: string;
+  role: MessageRole;
+  content: string;
+  timestamp: number;
+  image?: string; // base64 or data URL
+  audio?: string; // base64 or data URL
   isError?: boolean;
-  images?: ImageAttachment[];
+  groundingUrls?: GroundingUrl[];
 }
 
-export interface ImageAttachment {
-  mimeType: string;
-  data: string; // base64
-}
-
-export enum SocialPlatform {
-  WHATSAPP = 'WhatsApp',
-  INSTAGRAM = 'Instagram',
-  FACEBOOK = 'Facebook',
-  TELEGRAM = 'Telegram',
-  LINKEDIN = 'LinkedIn',
-  EMAIL = 'Email'
-}
-
-export enum ReplyTone {
-  FORMAL = 'Formal',
-  CASUAL = 'Casual',
-  FUNNY = 'Funny',
-  PROFESSIONAL = 'Professional',
-  EMPATHETIC = 'Empathetic'
-}
-
-export enum IndianLanguage {
-  ENGLISH = 'English',
-  TAMIL = 'Tamil',
-  TELUGU = 'Telugu',
-  MALAYALAM = 'Malayalam',
-  KANNADA = 'Kannada',
-  HINDI = 'Hindi',
-  BENGALI = 'Bengali',
-  MARATHI = 'Marathi'
+export interface GroundingUrl {
+  uri: string;
+  title: string;
 }
 
 export interface GeneratedMedia {
-  type: 'image' | 'video' | 'audio';
-  url: string;
+  id: string;
+  type: MediaType;
+  url: string; // Blob URL or Data URL
   prompt: string;
+  timestamp: number;
+  error?: string;
 }
 
-export interface NewsItem {
+export interface Slide {
+  title: string;
+  bullets: string[];
+}
+
+export interface Presentation {
+  topic: string;
+  slides: Slide[];
+  generatedAt: number;
+}
+
+export interface FormattedReply {
+  original: string;
+  platform: string;
+  tone: string;
+  reply: string;
+  generatedAt: number;
+}
+
+// ==================== API Response Types ====================
+
+export interface ChatResponse {
   text: string;
-  sources: {
-    web?: { uri: string; title: string };
-  }[];
+  groundingUrls?: GroundingUrl[];
 }
 
-export type VideoAspectRatio = '16:9' | '9:16';
-
-// Global interface for Veo key selection (AI Studio)
-declare global {
-  interface AIStudio {
-    hasSelectedApiKey: () => Promise<boolean>;
-    openSelectKey: () => Promise<void>;
-  }
-
-  interface Window {
-    aistudio?: AIStudio;
-  }
+export interface ApiError {
+  type: ErrorType;
+  message: string;
+  details?: unknown;
+  statusCode?: number;
 }
+
+export interface GenerationConfig {
+  model: string;
+  temperature?: number;
+  topP?: number;
+  topK?: number;
+  maxOutputTokens?: number;
+}
+
+// ==================== Utility Types ====================
+
+export type AsyncTask<T> = {
+  loading: boolean;
+  error: ApiError | null;
+  data: T | null;
+};
+
+export type ChatFocus = FocusMode.GENERAL | FocusMode.CODING;

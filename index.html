@@ -2,66 +2,108 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pin Ai - Personal Indian Ai</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#111111" />
+    <meta name="description" content="PIN AI - Personal Indian AI Studio. Multi-modal AI assistant with chat, image generation, and more. Fluent in English and Indian languages." />
+    <meta name="keywords" content="AI, Gemini, Chat, Image Generation, Tamil, Telugu, Kannada, Malayalam, Hindi, AI Assistant" />
+    <meta name="author" content="Logesh" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="PIN AI" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg viewBox='0 0 48 48' xmlns='http://www.w3.org/2000/svg'><rect width='48' height='48' rx='12' fill='%23115e59'/><path d='M19 36V12H27C31.5 12 35 15.5 35 20C35 24.5 31.5 28 27 28H19' stroke='%23FCD34D' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/><circle cx='35' cy='20' r='3' fill='%23fbbf24'/></svg>" />
+    
+    <title>PIN AI - Personal Indian AI Studio</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script>
       tailwind.config = {
         theme: {
           extend: {
             colors: {
               pin: {
-                dark: '#0f172a',
-                darker: '#020617',
-                teal: '#14b8a6',
-                gold: '#fbbf24',
-                accent: '#0d9488'
+                orange: '#FF9933',
+                white: '#FFFFFF',
+                green: '#138808',
+                blue: '#000080',
+                dark: '#1a1a1a',
+                darker: '#111111',
+                accent: '#8B5CF6'
               }
             },
+            animation: {
+              'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            },
             fontFamily: {
-              sans: ['Inter', 'sans-serif'],
+              sans: ['system-ui', 'sans-serif'],
             }
           }
         }
       }
     </script>
     <style>
-      /* Custom scrollbar for webkit */
+      * {
+        -webkit-tap-highlight-color: transparent;
+      }
+      
+      /* Custom Scrollbar */
       ::-webkit-scrollbar {
         width: 8px;
         height: 8px;
       }
       ::-webkit-scrollbar-track {
-        background: #020617; 
+        background: #1a1a1a;
       }
       ::-webkit-scrollbar-thumb {
-        background: #334155; 
+        background: #333;
         border-radius: 4px;
       }
       ::-webkit-scrollbar-thumb:hover {
-        background: #475569; 
+        background: #555;
       }
-      .animate-fade-in {
-        animation: fadeIn 0.5s ease-out;
+      
+      /* Hide scrollbar for mobile nav */
+      .scrollbar-hide::-webkit-scrollbar {
+        display: none;
       }
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
+      .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+      
+      /* Safe area padding for iPhones */
+      .safe-area-bottom {
+        padding-bottom: env(safe-area-inset-bottom);
+      }
+      
+      /* Smooth animations */
+      html {
+        scroll-behavior: smooth;
+      }
+      
+      /* Prevent text selection on buttons */
+      button {
+        user-select: none;
+      }
+      
+      /* Focus styles for accessibility */
+      button:focus-visible,
+      input:focus-visible,
+      textarea:focus-visible {
+        outline: 2px solid #FF9933;
+        outline-offset: 2px;
       }
     </style>
-  <script type="importmap">
-{
-  "imports": {
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "react": "https://esm.sh/react@^19.2.3",
-    "@google/genai": "https://esm.sh/@google/genai@^1.33.0"
-  }
-}
-</script>
-</head>
-  <body class="bg-pin-darker text-slate-200 antialiased overflow-hidden">
+  </head>
+  <body class="bg-pin-darker text-gray-200 antialiased overflow-hidden">
+    <noscript>
+      <div style="display: flex; align-items: center; justify-content: center; height: 100vh; color: #999; background: #111;">
+        <p>PIN AI requires JavaScript to be enabled. Please enable JavaScript in your browser settings.</p>
+      </div>
+    </noscript>
     <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
   </body>
 </html>
+export default defineConfig({
+  base: '/PIN-AI/',  // Your repo name
+  // ... rest of config
+});

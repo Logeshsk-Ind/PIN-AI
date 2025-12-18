@@ -1,22 +1,36 @@
 {
   "name": "pin-ai",
+  "description": "PIN AI - Personal Indian AI Studio, a multi-modal AI assistant",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.3.3",
   "type": "module",
+  "author": "Logesh",
+  "license": "MIT",
+  "homepage": "https://logeshsk-ind.github.io/Web/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/logeshsk-ind/PIN-AI.git"
+  },
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "react-dom": "^19.2.3",
     "react": "^19.2.3",
-    "@google/genai": "^1.33.0"
+    "react-dom": "^19.2.3",
+    "@google/genai": "^1.33.0",
+    "react-markdown": "^10.1.0",
+    "lucide-react": "^0.561.0"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^5.0.0",
     "typescript": "~5.8.2",
     "vite": "^6.2.0"
-  }
+  },
+  "keywords": ["ai", "gemini", "react", "typescript", "indian", "tamil", "multilingual"]
 }
